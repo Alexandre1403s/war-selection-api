@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import os
 from flask_cors import CORS  # Ajout de Flask-CORS
 
@@ -6,7 +6,8 @@ app = Flask(__name__)
 CORS(app)  # Active CORS pour toutes les routes
 
 # Assurer que le dossier "replays" existe
-os.makedirs("replays", exist_ok=True)
+UPLOAD_FOLDER = "replays"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Route pour tester si l'API fonctionne
 @app.route('/', methods=['GET'])
@@ -20,7 +21,7 @@ def upload_replay():
         return jsonify({"error": "No file uploaded"}), 400
 
     file = request.files['file']
-    file_path = os.path.join("replays", file.filename)
+    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(file_path)
 
     return jsonify({"message": f"Fichier {file.filename} reçu avec succès"}), 200
@@ -28,8 +29,13 @@ def upload_replay():
 # Route pour lister les replays
 @app.route("/api/list_replays", methods=["GET"])
 def list_replays():
-    files = os.listdir("replays")
+    files = os.listdir(UPLOAD_FOLDER)
     return jsonify(files)
+
+# Route pour télécharger les fichiers replays
+@app.route("/replays/<filename>", methods=["GET"])
+def get_replay(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
