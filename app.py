@@ -22,6 +22,18 @@ def upload_replay():
     file.save(file_path)
 
     return jsonify({"message": f"Fichier {file.filename} reçu avec succès"}), 200
+import os
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+UPLOAD_FOLDER = "replays"  # Assure-toi que c'est bien le dossier où tes fichiers sont enregistrés
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+@app.route("/api/list_replays", methods=["GET"])
+def list_replays():
+    files = os.listdir(app.config["UPLOAD_FOLDER"])
+    return jsonify(files)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
