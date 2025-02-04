@@ -4,7 +4,9 @@ import os
 app = Flask(__name__)
 
 # Assurer que le dossier "replays" existe
-os.makedirs("replays", exist_ok=True)
+UPLOAD_FOLDER = "replays"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # Route pour tester si l'API fonctionne
 @app.route('/', methods=['GET'])
@@ -18,18 +20,12 @@ def upload_replay():
         return jsonify({"error": "No file uploaded"}), 400
 
     file = request.files['file']
-    file_path = os.path.join("replays", file.filename)
+    file_path = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
     file.save(file_path)
 
     return jsonify({"message": f"Fichier {file.filename} reçu avec succès"}), 200
-import os
-from flask import Flask, jsonify
 
-app = Flask(__name__)
-
-UPLOAD_FOLDER = "replays"  # Assure-toi que c'est bien le dossier où tes fichiers sont enregistrés
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
+# Route pour lister les fichiers replay
 @app.route("/api/list_replays", methods=["GET"])
 def list_replays():
     files = os.listdir(app.config["UPLOAD_FOLDER"])
@@ -37,4 +33,3 @@ def list_replays():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
-
