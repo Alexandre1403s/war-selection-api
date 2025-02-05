@@ -39,3 +39,8 @@ def get_replay(filename):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
+@app.route("/api/debug_replays", methods=["GET"])
+def debug_replays():
+    files = os.listdir(UPLOAD_FOLDER)
+    print("Fichiers disponibles dans 'replays':", files)  # Debug
+    return jsonify(files)
